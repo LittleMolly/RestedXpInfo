@@ -1,5 +1,7 @@
 local restedXpFrame = CreateFrame("Frame", "RestedXpFrame")
 
+RESTED_XP_INFO_CAP_MULTIPLIER = 1.13
+
 local timeLastUpdate = 0
 local executionInterval = 2 -- 1 second
 
@@ -37,7 +39,7 @@ function restedXpInfo_calculateXpValues(self, event)
 	
     if restedXp then        
         local XPMax = UnitXPMax("player")
-        local restedCap = XPMax * 1.5
+        local restedCap = XPMax * RESTED_XP_INFO_CAP_MULTIPLIER
         local xpUntilCap = restedCap - restedXp
         local restedPercentage = 100 * restedXp / restedCap
 
@@ -50,6 +52,7 @@ function restedXpInfo_calculateXpValues(self, event)
 	return restedPercentageFormatted
 end
 
+-- Deprecated: kept for compatibility; the tooltip no longer shows tent counts.
 function xpSpeedToTentCount(xpSpeed)
 	if not (xpSpeed) then
 		return ""
@@ -72,8 +75,8 @@ function drawTooltip()
 	GameTooltip:AddLine(restedXpInfo_calculateXpValues() .."% of max rested XP")
 	
 	if (restedPerSecond and restedPerSecond > 0 and lastLastRestedXP > 0) then
-		perMinute = (restedPerSecond*60)/(UnitXPMax("player")*1.5) * 100
-		GameTooltip:AddLine(xpSpeedToTentCount(perMinute) .." (".. string.format("%.1f", perMinute) .."%/min)")
+		perMinute = (restedPerSecond*60)/(UnitXPMax("player")*RESTED_XP_INFO_CAP_MULTIPLIER) * 100
+		GameTooltip:AddLine(string.format("%.1f%%/min", perMinute))
 	end
 	GameTooltip:Show()
 end
@@ -88,3 +91,5 @@ MainMenuExpBar:SetScript("OnLeave", function()
 	tooltip = nil
 end)
 
+MainMenuExpBar.lockShow = 1
+MainMenuBarExpText:Show()
